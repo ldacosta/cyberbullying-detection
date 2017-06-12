@@ -358,8 +358,8 @@ class Formspring_Data_Parser():
             list_of_questions = questions_from_raw
             # parse answer
             answers_from_raw = self.__raw2cleans__(the_a_raw)
-            # TODO => following line is a LIST of strings!
             list_of_answers = answers_from_raw
+            # parse votes
             all_votes_as_yes = [l for l in labels if l == 'yes']
             is_threat = (len(all_votes_as_yes) / len(labels)) >= 0.5
             #
@@ -375,6 +375,7 @@ class Formspring_Data_Parser():
                     # "answer_as_sounds": the_a_raw,
                     "threat": is_threat
                 })
+        self.alogger.debug("Generated data for entry = {}".format(an_id))
         return pd.DataFrame(r)
         # return r
 
