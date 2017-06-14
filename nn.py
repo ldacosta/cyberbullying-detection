@@ -3,8 +3,33 @@ import keras
 from keras.optimizers import SGD
 from keras.layers import Flatten, Input, Dense, Conv2D, MaxPooling2D, Dropout
 from keras.models import Model
+from keras.callbacks import Callback, ModelCheckpoint
+import warnings
+
+class EarlyStoppingByLossVal(Callback):
+    def __init__(self, monitor='val_loss', value=0.00001, verbose=0):
+        super(Callback, self).__init__()
+        self.monitor = monitor
+        self.value = value
+        self.verbose = verbose
+
+    def on_epoch_end(self, epoch, logs={}):
+        current = logs.get(self.monitor)
+        if current is None:
+            warnings.warn("Early stopping requires %s available!" % self.monitor, RuntimeWarning)
+        elif current < self.value:
+            if self.verbose > 0:
+                print("Epoch %05d: early stopping THR" % epoch)
+            self.model.stop_training = True
+
+callbacks = [
+    EarlyStoppingByLossVal(monitor='val_loss', value=0.00001, verbose=1),
+    ModelCheckpoint(filepath='/tmp/weights.hdf5', verbose=1, save_best_only=True),
+    # ModelCheckpoint(kfold_weights_path, monitor='val_loss', save_best_only=True, verbose=0),
+]
 
 class CyberbullyingDetectionnNN(object):
+
 
     def __create_conv_plus_max_pooling__(self, a_size: int, inputs):
         # 2D 3x3 convolution followed by a maxpool
@@ -49,9 +74,11 @@ class CyberbullyingDetectionnNN(object):
         return self.model.summary()
 
     def fit(self, x_train, y_train, batch_size, epochs):
-        self.model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs)
+        self.model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_split = 0.1, callbacks=callbacks)
 
     def evaluate(self, x, y, batch_size):
+        self.model.load_weights()
+        keras.engine.training.Model.load_weights()
         return self.model.evaluate(x, y, batch_size=batch_size)
 
 
