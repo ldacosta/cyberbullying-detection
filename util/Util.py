@@ -1,7 +1,7 @@
 import logging
 import re
 from typing import List, Dict
-
+from logging.handlers import RotatingFileHandler
 
 def get_logger(name: str, debug_log_file_name: str): # -> logging.Logger:
     alogger = logging.getLogger(name)
@@ -10,8 +10,8 @@ def get_logger(name: str, debug_log_file_name: str): # -> logging.Logger:
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     #
     create_debug_handler = False
-
-    fh = logging.FileHandler(debug_log_file_name)
+    # fh = logging.FileHandler(debug_log_file_name)
+    fh = RotatingFileHandler(debug_log_file_name, mode='a', maxBytes=5 * 1024 * 1024, backupCount=2, encoding=None, delay=0)
     fh.setLevel(logging.DEBUG)
     fh.setFormatter(formatter)
 
