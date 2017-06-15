@@ -1,13 +1,14 @@
 import logging
 import re
 from typing import List, Dict
+import urllib
 from logging.handlers import RotatingFileHandler
 
 def get_logger(name: str, debug_log_file_name: str): # -> logging.Logger:
     alogger = logging.getLogger(name)
     alogger.setLevel(logging.DEBUG) # CAREFUL ==> need this, otherwise everybody chokes!
     # create formatter
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s [%(module)s.%(funcName)s:%(lineno)d => %(message)s]')
     #
     create_debug_handler = False
     # fh = logging.FileHandler(debug_log_file_name)
@@ -95,3 +96,7 @@ def smart_split_in_words(a_sentence: str) -> List[str]:
     return list(map(replace_3_or_more_letters, clean_sentence.split()))
 
 
+def download_file(url, fname):
+    urllib.request.urlretrieve(url, fname)
+
+flatten = lambda l: [item for sublist in l for item in sublist]
