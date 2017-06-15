@@ -6,7 +6,8 @@ import numpy as np
 from typing import List, Dict
 
 from phonemes_from_graphemes import SoundsDict
-
+import os
+from util import Util
 
 class ModelWrapper():
     default_shelf_filename = 'shelf_from0_for2999999.shelf'
@@ -42,6 +43,11 @@ class ModelWrapper():
     @classmethod
     def from_google_news_model(cls, data_dir: str, alogger: logging.Logger):
         f_name = '{}/GoogleNews-vectors-negative300.bin.gz'.format(data_dir)
+        MODEL_ON_GOOGLE_NEWS = "https://s3.amazonaws.com/dl4j-distribution/GoogleNews-vectors-negative300.bin.gz"
+        if not os.path.isfile(f_name):
+            alogger.info("Downloading '{}' to '{}'".format(MODEL_ON_GOOGLE_NEWS, f_name))
+            Util.download_file(MODEL_ON_GOOGLE_NEWS, f_name)
+        alogger.info("'{}' is downloaded as '{}'".format(MODEL_ON_GOOGLE_NEWS, f_name))
         alogger.info("Loading model from {}...".format(f_name))
         model = gensim.models.word2vec.KeyedVectors.load_word2vec_format(f_name, binary=True)
         alogger.info("Model succesfully loaded")

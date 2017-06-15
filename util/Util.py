@@ -2,6 +2,7 @@ import logging
 import re
 from typing import List, Dict
 import urllib
+import urllib.request
 from logging.handlers import RotatingFileHandler
 import subprocess
 import os
