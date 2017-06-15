@@ -77,12 +77,14 @@ if __name__ == "__main__":
     from words_2_vectors import *
     import os
 
-    # let's go to the appropriate directory
-    os.chdir('/Users/luisd/dev/cyberbullying-detection')
     #
     data_dir = "./data"
     common_logger = get_logger(name="common_logger", debug_log_file_name="common_logger.log")
     print("Debug will be written in {}".format(common_logger.handlers[1].baseFilename))
+    # let's go to the appropriate directory
+    root_dir = get_git_root()
+    common_logger.info("Switching to directory '{}'".format(root_dir))
+    os.chdir(root_dir)
     mw = ModelWrapper.from_google_news_model(data_dir=data_dir, alogger=common_logger)
     sounds_dict = SoundsDict(a_dir=data_dir, alogger=common_logger)
     mw.set_sounds_dict(sounds_dict=sounds_dict)
