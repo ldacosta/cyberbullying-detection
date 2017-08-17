@@ -1,0 +1,133 @@
+name: python3.6
+channels:
+- r
+- conda-forge
+- anaconda-fusion
+- defaults
+dependencies:
+- future=0.16.0=py36_0
+- keras=2.0.2=py36_1
+- mock=2.0.0=py36_0
+- pbr=3.0.1=py36_0
+- preprocess=1.2.2=py36_0
+- protobuf=3.3.0=py36_2
+- tensorflow=1.0.0=py36_0
+- xmltodict=0.11.0=py36_0
+- appnope=0.1.0=py36_0
+- beautifulsoup4=4.5.3=py36_0
+- bokeh=0.12.5=py36_0
+- boto=2.46.1=py36_0
+- bz2file=0.98=py36_0
+- cairo=1.14.8=0
+- cloudpickle=0.2.2=py36_0
+- curl=7.54.1=0
+- cycler=0.10.0=py36_0
+- cymem=1.31.2=py36_0
+- decorator=4.0.11=py36_0
+- django=1.10.5=py36_0
+- fontconfig=2.12.1=3
+- freetype=2.5.5=2
+- gensim=1.0.1=np112py36_0
+- gettext=0.19.8=1
+- glib=2.50.2=1
+- gsl=2.2.1=0
+- h5py=2.7.0=np112py36_0
+- harfbuzz=0.9.39=2
+- hdf5=1.8.17=1
+- icu=54.1=0
+- ipykernel=4.6.1=py36_0
+- ipython=6.0.0=py36_0
+- ipython_genutils=0.2.0=py36_0
+- jbig=2.1=0
+- jinja2=2.9.6=py36_0
+- joblib=0.11=py36_0
+- jpeg=9b=0
+- jupyter_client=5.0.1=py36_0
+- jupyter_core=4.3.0=py36_0
+- krb5=1.13.2=0
+- libffi=3.2.1=1
+- libgcc=4.8.5=1
+- libiconv=1.14=0
+- libpng=1.6.27=0
+- libssh2=1.8.0=0
+- libtiff=4.0.6=3
+- libxml2=2.9.4=0
+- markupsafe=0.23=py36_2
+- matplotlib=2.0.0=np112py36_0
+- mkl=2017.0.1=0
+- murmurhash=0.26.4=py36_0
+- ncurses=5.9=10
+- nltk=3.2.2=py36_0
+- numpy=1.12.1=py36_0
+- openssl=1.0.2k=1
+- pandas=0.19.2=np112py36_1
+- pango=1.40.3=1
+- path.py=10.3.1=py36_0
+- pcre=8.39=1
+- pexpect=4.2.1=py36_0
+- pickleshare=0.7.4=py36_0
+- pip=9.0.1=py36_1
+- pixman=0.34.0=0
+- plac=0.9.6=py36_0
+- preshed=0.46.4=py36_0
+- prompt_toolkit=1.0.14=py36_0
+- ptyprocess=0.5.1=py36_0
+- pygments=2.2.0=py36_0
+- pyparsing=2.1.4=py36_0
+- pyqt=5.6.0=py36_2
+- python=3.6.1=0
+- python-dateutil=2.6.0=py36_0
+- pytz=2017.2=py36_0
+- pyyaml=3.12=py36_0
+- pyzmq=16.0.2=py36_0
+- qt=5.6.2=0
+- readline=6.2=2
+- requests=2.13.0=py36_0
+- scikit-learn=0.18.1=np112py36_1
+- scipy=0.19.0=np112py36_0
+- semver=2.7.6=py36_0
+- setuptools=27.2.0=py36_0
+- simplegeneric=0.8.1=py36_1
+- singledispatch=3.4.0.3=py36_0
+- sip=4.18=py36_0
+- six=1.10.0=py36_0
+- smart_open=1.4.0=py36_0
+- spacy=0.101.0=py36_0
+- sputnik=0.9.3=py36_0
+- sqlite=3.13.0=0
+- thinc=5.0.8=py36_0
+- tk=8.5.18=0
+- tornado=4.4.2=py36_0
+- tqdm=4.11.2=py36_0
+- traitlets=4.3.2=py36_0
+- ujson=1.35=py36_0
+- wcwidth=0.1.7=py36_0
+- wheel=0.29.0=py36_0
+- xz=5.2.2=1
+- yaml=0.1.6=0
+- zlib=1.2.8=3
+- r-base=3.4.1=0
+- pip:
+  - astroid==1.5.3
+  - chardet==3.0.2
+  - cssselect==1.0.1
+  - environment-kernels==1.1
+  - git-pylint-commit-hook==2.2.2
+  - gnureadline==6.3.3
+  - ipython-genutils==0.2.0
+  - isort==4.2.15
+  - jedi==0.10.2
+  - jupyter-client==5.0.1
+  - jupyter-core==4.3.0
+  - lazy-object-proxy==1.3.1
+  - lxml==3.7.3
+  - mccabe==0.6.1
+  - music21==3.1.0
+  - prompt-toolkit==1.0.14
+  - pylint==1.7.2
+  - readability-lxml==0.6.2
+  - rpy2==2.8.6
+  - smart-open==1.5.2
+  - wrapt==1.10.11
+prefix: /Users/luisd/sw/anaconda3/envs/python3.6
+
