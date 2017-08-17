@@ -31,10 +31,13 @@ class SoundsDict:
         # read shelves files from directory:
         file_names = [os.path.join(a_dir, os.path.splitext(f)[0]) for
                       f in [f for f in listdir(a_dir) if isfile(join(a_dir, f)) and "shelf" in f and "from" in f and "for" in f]]
-        self.alogger.debug("Initializing with shelves {}".format(file_names))
         self.all_shelves = []
-        self.all_shelves = list(map(self.__file_name_2_shelf_or_None__, file_names))
-        self.all_shelves = [ a_shelf for a_shelf in self.all_shelves if a_shelf is not None ]
+        if len(file_names) == 0:
+            self.alogger.warning("There are no sounds dictionaries in directory '{}'".format(a_dir))
+        else:
+            self.alogger.debug("Initializing with shelves {}".format(file_names))
+            self.all_shelves = list(map(self.__file_name_2_shelf_or_None__, file_names))
+            self.all_shelves = [ a_shelf for a_shelf in self.all_shelves if a_shelf is not None ]
 
     def __getitem__(self, key):
         """

@@ -19,12 +19,14 @@ class EarlyStoppingByLossVal(Callback):
             warnings.warn("Early stopping requires %s available!" % self.monitor, RuntimeWarning)
         elif current < self.value:
             if self.verbose > 0:
-                print("Epoch %05d: early stopping THR" % epoch)
+                print("\n ========> Epoch %05d: early stopping THR <==========\n" % epoch)
             self.model.stop_training = True
 
+persistence_file = '/tmp/weights.hdf5'
+
 callbacks = [
-    EarlyStoppingByLossVal(monitor='val_loss', value=0.00001, verbose=1),
-    ModelCheckpoint(filepath='/tmp/weights.hdf5', verbose=1, save_best_only=True),
+    EarlyStoppingByLossVal(monitor='val_loss', value=0.0001, verbose=1),
+    ModelCheckpoint(filepath=persistence_file, verbose=1, save_best_only=True),
     # ModelCheckpoint(kfold_weights_path, monitor='val_loss', save_best_only=True, verbose=0),
 ]
 
@@ -77,8 +79,8 @@ class CyberbullyingDetectionnNN(object):
         self.model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_split = 0.1, callbacks=callbacks)
 
     def evaluate(self, x, y, batch_size):
-        self.model.load_weights()
-        keras.engine.training.Model.load_weights()
+        self.model.load_weights(persistence_file)
+        # keras.engine.training.Model.load_weights()
         return self.model.evaluate(x, y, batch_size=batch_size)
 
 

@@ -47,6 +47,8 @@ class reviews_labels_encoder(object):
         :param labels: all labels 
         """
         # nlp stuff
+        assert mw is not None
+
         if spacy_nlp is None:
             self.nlp = spacy.load('en')
         else:

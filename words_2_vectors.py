@@ -42,6 +42,9 @@ class ModelWrapper():
 
     @classmethod
     def from_google_news_model(cls, data_dir: str, alogger: logging.Logger):
+        if not os.path.exists(data_dir):
+            alogger.info("Creating directory '{}'".format(data_dir))
+            os.makedirs(data_dir)
         f_name = '{}/GoogleNews-vectors-negative300.bin.gz'.format(data_dir)
         MODEL_ON_GOOGLE_NEWS = "https://s3.amazonaws.com/dl4j-distribution/GoogleNews-vectors-negative300.bin.gz"
         if not os.path.isfile(f_name):

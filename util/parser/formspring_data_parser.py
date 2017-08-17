@@ -7,7 +7,7 @@ import pandas as pd
 import xmltodict
 from typing import List, Dict
 
-from phonemes_from_graphemes import PhonemesFromGraphemes
+from phonemes_from_graphemes import PhonemesFromGraphemes, SoundsDict
 from util.Util import clean_text
 from util.parser.data_parser import *
 from words_2_vectors import ModelWrapper
@@ -127,3 +127,144 @@ class Formspring_Data_Parser(Data_Parser):
 
     def labels(self):
         return ["THREAT" if threat else "CLEAN" for threat in self.really_all['threat'].tolist()]
+
+def properly_create_model_wrapper(mw: ModelWrapper, sounds_dict: SoundsDict, common_logger: logging.Logger) -> (ModelWrapper, SoundsDict):
+    if mw is None:
+        mw = ModelWrapper.from_google_news_model(data_dir=data_dir, alogger=common_logger)
+    # sounds dictionary
+    if sounds_dict is None:
+        sounds_dict = SoundsDict(a_dir=data_dir, alogger=common_logger)
+    mw.set_sounds_dict(sounds_dict=sounds_dict)
+    return mw, sounds_dict
+
+def build_formspring_parser_and_load_everyone(
+    read_from_here: str,
+    mw: ModelWrapper,
+    sounds_dict: SoundsDict,
+    phonemesFactory: PhonemesFromGraphemes,
+    data_dir: str,
+    common_logger: logging.Logger) -> (Formspring_Data_Parser, ModelWrapper, SoundsDict, PhonemesFromGraphemes):
+    """
+    Returns the parser + everyhting we needed to build it: 
+    * the Model Wrapper
+    * the Sounds Dictionary 
+    * the phonemes_from_graphemes class
+    """
+    assert (read_from_here is not None) or (data_dir is not None)
+    if read_from_here is not None:
+        a_formspring_data_parser = Formspring_Data_Parser(all_data = pd.read_csv(read_from_here), alogger = common_logger)
+    else:
+        # model wrapper and sounds dictionary
+        mw, sounds_dict = properly_create_model_wrapper(mw, sounds_dict, common_logger)
+        # phonemes factory
+        if phonemesFactory is None:
+            phonemesFactory = PhonemesFromGraphemes(alogger=common_logger)
+        # parser
+        xml_file_name = '/Users/luisd/Downloads/FormspringLabeledForCyberbullying/XMLMergedFile.xml'
+        a_formspring_data_parser = Formspring_Data_Parser.from_raw_xml(xml_file_name, pg = phonemesFactory, mw = mw, alogger = common_logger)
+    #
+    return (a_formspring_data_parser, mw, sounds_dict, phonemesFactory)
+
+def formspring_load_or_create(
+        formspring_parser_load: bool,
+        common_logger: logging.Logger,
+        mw,
+        sounds_dict,
+        phonemesFactory,
+        data_dir) -> (Formspring_Data_Parser, ModelWrapper, SoundsDict, PhonemesFromGraphemes):
+    if formspring_parser_load:
+        print("Please monitor the debug file (ie, run 'tail -f {}')".format(common_logger.handlers[1].baseFilename))
+        (a_formspring_data_parser, mw, sounds_dict, phonemesFactory) = build_formspring_parser_and_load_everyone(
+            read_from_here = "really_all_of_them.csv",
+            mw = mw,
+            sounds_dict = sounds_dict,
+            phonemesFactory = phonemesFactory,
+            data_dir = data_dir,
+            common_logger = common_logger)
+    else:
+        (a_formspring_data_parser, mw, sounds_dict, phonemesFactory) = build_formspring_parser_and_load_everyone(
+            read_from_here = None,
+            mw = mw,
+            sounds_dict = sounds_dict,
+            phonemesFactory = phonemesFactory,
+            data_dir = data_dir,
+            common_logger = common_logger)
+    common_logger.info("Formspring parser should have been loaded")
+    return (a_formspring_data_parser, mw, sounds_dict, phonemesFactory)
+
+from sklearn import model_selection
+import util.Data as util_data
+
+
+def run_neural_networks(sents_encoder: util_data.reviews_labels_encoder, questions_answers_formspring, labels_formspring):
+    # fully connected
+    # TODO: the datasets are very imbalanced - so we must do some over(/under) sampling. Maybe https://github.com/scikit-learn-contrib/imbalanced-learn ?
+    X_train, X_test, y_train, y_test = model_selection.train_test_split(questions_answers_formspring, labels_formspring,
+                                                                        test_size=0.33, random_state=42)
+    cyber_fc = fc_nn.CyberbullyingFullyConnectedNetwork(reviews=questions_answers_formspring, labels=labels_formspring,hidden_nodes=300,learning_rate=0.01)
+    cyber_fc.train(X_train, y_train)
+    cyber_fc.test(X_test, y_test)
+
+    # P-CNN
+    cnn_k = nn.CyberbullyingDetectionnNN(features_in_words=300, words_in_review=10)
+    # nn.sanity_check()
+    reviews_as_matrix = sents_encoder.reviews_as_matrix()
+    labels_as_matrix = sents_encoder.labels_as_matrix()
+
+    # Split the data
+    # TODO: the datasets are very imbalanced - so we must do some over(/under) sampling. Maybe https://github.com/scikit-learn-contrib/imbalanced-learn ?
+    X_train, X_test, y_train, y_test = model_selection.train_test_split(reviews_as_matrix, labels_as_matrix,
+                                                                        test_size=0.33, random_state=42)
+    an_x_subset = X_train[:500]
+    a_y_subset = y_train[:500]
+    cnn_k.fit(x_train=an_x_subset.reshape(an_x_subset.shape + (1,)), y_train=a_y_subset, batch_size=78, epochs=20)
+    # cnn_k.fit(x_train=X_train.reshape(X_train.shape + (1,)), y_train=y_train, batch_size=78, epochs=20)
+
+    print(cnn_k.evaluate(x = X_test.reshape(X_test.shape + (1,)), y = y_test, batch_size=80))
+
+
+if __name__ == "__main__":
+    from util.Util import *
+    from phonemes_from_graphemes import *
+    from words_2_vectors import *
+    import os
+    import nn
+    import fc_nn
+    import spacy  # nl processing
+
+    WORDS_FOR_TEXT = 25 # how many words to take on each text to do the classification
+
+    #
+    # let's go to the appropriate directory
+    root_dir = get_git_root()
+    os.chdir(root_dir)
+    data_dir = "./data"
+    common_logger = get_logger(name="common_logger", debug_log_file_name="common_logger.log")
+    common_logger.info("Switched to directory '{}'".format(root_dir))
+    common_logger.info("Debug will be written in {}".format(common_logger.handlers[1].baseFilename))
+    #
+    #
+    formspring_parser_load = True
+    existing_components = False
+    print("Please monitor the debug file (ie, run 'tail -f {}')".format(common_logger.handlers[1].baseFilename))
+    (a_formspring_data_parser, mw, sounds_dict, phonemesFactory) = formspring_load_or_create(
+        formspring_parser_load,
+        common_logger,
+        mw = None,
+        sounds_dict = None,
+        phonemesFactory = None,
+        data_dir = data_dir)
+
+    questions_answers_formspring = a_formspring_data_parser.interactions()
+    labels_formspring = a_formspring_data_parser.labels()
+
+
+    mw, _ = properly_create_model_wrapper(mw, sounds_dict, common_logger)
+    nlp = spacy.load('en')
+    sents_encoder = util_data.reviews_labels_encoder(
+        mw,
+        n_words_in_review = 10,
+        reviews = list(map(lambda x: util_data.review(x), questions_answers_formspring)),
+        labels = list(map(lambda x: util_data.label(x), labels_formspring)),
+        spacy_nlp = nlp)
+    run_neural_networks(sents_encoder, questions_answers_formspring, labels_formspring)
